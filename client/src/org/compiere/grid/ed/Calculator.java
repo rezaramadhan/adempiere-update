@@ -129,6 +129,7 @@ public final class Calculator extends CDialog
 
 	private BigDecimal		m_number;			//	the current number
 	private String			m_display = "";		//	what is displayed
+	private boolean			statDisplay = false; //input user or answer , false = input user
 	private int 			m_DisplayType;
 	private DecimalFormat 	m_format;
 	private int				m_WindowNo;
@@ -168,6 +169,14 @@ public final class Calculator extends CDialog
 	private JButton bDec = new JButton();
 	private JButton b0 = new JButton();
 	private JButton bPlus = new JButton();
+	private JButton bSin = new JButton();
+	private JButton bCos = new JButton();
+	private JButton bTan = new JButton();
+	private JButton bLog = new JButton();
+	private JButton bPow = new JButton();
+	private JButton bSqrt = new JButton();
+	private JButton bExp = new JButton();
+	private JButton bMod = new JButton();
 	private CPanel bordPanel = new CPanel();
 	private CPanel currencyPanel = new CPanel();
 	private BorderLayout bordLayout = new BorderLayout();
@@ -232,6 +241,14 @@ public final class Calculator extends CDialog
 		b0.setText("0");
 		bPlus.setForeground(Color.blue);
 		bPlus.setText("+");
+		bSin.setText("sin");
+		bCos.setText("cos");
+		bTan.setText("tan");
+		bPow.setText("^");
+		bSqrt.setText("sqrt");
+		bLog.setText("log");
+		bExp.setText("exp");
+		bMod.setText("mod");
 		bordPanel.setLayout(bordLayout);
 		curLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		curLabel.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -253,21 +270,29 @@ public final class Calculator extends CDialog
 		currencyPanel.add(curLabel, null);
 		currencyPanel.add(curTo, null);
 		bordPanel.add(keyPanel, BorderLayout.CENTER);
+		keyPanel.add(bSin, null);
+		keyPanel.add(bSqrt, null);		
 		keyPanel.add(bAC, null);
 		keyPanel.add(b7, null);
 		keyPanel.add(b8, null);
 		keyPanel.add(b9, null);
 		keyPanel.add(bM, null);
+		keyPanel.add(bCos, null);
+		keyPanel.add(bMod, null);
 		keyPanel.add(bC, null);
 		keyPanel.add(b4, null);
 		keyPanel.add(b5, null);
 		keyPanel.add(b6, null);
 		keyPanel.add(bDiv, null);
+		keyPanel.add(bTan, null);
+		keyPanel.add(bExp, null);
 		keyPanel.add(bProc, null);
 		keyPanel.add(b1, null);
 		keyPanel.add(b2, null);
 		keyPanel.add(b3, null);
 		keyPanel.add(bMin, null);
+		keyPanel.add(bLog, null);
+		keyPanel.add(bPow, null);
 		keyPanel.add(bCur, null);
 		keyPanel.add(b0, null);
 		keyPanel.add(bDec, null);
@@ -353,7 +378,13 @@ public final class Calculator extends CDialog
 			case '3':		case '4':		case '5':
 			case '6':		case '7':		case '8':
 			case '9':
-				m_display += c;
+				if (statDisplay) { //handle answer
+					m_display = ""+c;
+					statDisplay = false;
+				} else {//handle input user
+					m_display += c;
+				}
+				
 				break;
 
 			//	Decimal		===============================
@@ -400,6 +431,7 @@ public final class Calculator extends CDialog
 			case '=':
 				m_display = m_format.format(evaluate());
 				m_abort = false;
+				statDisplay = true; //answer
 				if (isDisposeOnEqual()) //teo_sarca, bug [ 1628773 ] 
 					dispose();
 				break;
