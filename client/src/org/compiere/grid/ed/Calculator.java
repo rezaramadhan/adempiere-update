@@ -129,6 +129,7 @@ public final class Calculator extends CDialog
 
 	private BigDecimal		m_number;			//	the current number
 	private String			m_display = "";		//	what is displayed
+	private boolean			statDisplay = false; //input user or answer , false = input user
 	private int 			m_DisplayType;
 	private DecimalFormat 	m_format;
 	private int				m_WindowNo;
@@ -353,7 +354,13 @@ public final class Calculator extends CDialog
 			case '3':		case '4':		case '5':
 			case '6':		case '7':		case '8':
 			case '9':
-				m_display += c;
+				if (statDisplay) { //handle answer
+					m_display = ""+c;
+					statDisplay = false;
+				} else {//handle input user
+					m_display += c;
+				}
+				
 				break;
 
 			//	Decimal		===============================
@@ -400,6 +407,7 @@ public final class Calculator extends CDialog
 			case '=':
 				m_display = m_format.format(evaluate());
 				m_abort = false;
+				statDisplay = true; //answer
 				if (isDisposeOnEqual()) //teo_sarca, bug [ 1628773 ] 
 					dispose();
 				break;
