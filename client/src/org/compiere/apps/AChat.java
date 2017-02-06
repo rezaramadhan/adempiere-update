@@ -21,19 +21,26 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import javax.swing.JSplitPane;
 
+import org.apache.ecs.xhtml.b;
+import org.apache.ecs.xhtml.hr;
+import org.apache.ecs.xhtml.p;
 import org.compiere.model.MChat;
 import org.compiere.model.MChatEntry;
+import org.compiere.model.MUser;
 import org.compiere.swing.CDialog;
 import org.compiere.swing.CPanel;
 import org.compiere.swing.CTextArea;
 import org.compiere.swing.CTextPane;
 import org.compiere.util.CLogger;
+import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Util;
 
 /**
  * 	Application Chat
@@ -143,7 +150,6 @@ public class AChat extends CDialog
 		historyText.setText(text);
 	}	//	loadChat
 	
-
 	/**
 	 * 	Action Performed
 	 *	@param e event
@@ -161,8 +167,12 @@ public class AChat extends CDialog
 				MChatEntry entry = new MChatEntry(m_chat, data);
 				entry.saveEx();
 			}	//	data to be saved
+			loadChat();
+		} else if (e.getActionCommand().equals(ConfirmPanel.A_CANCEL)) {
+			dispose();
 		}
-		dispose();
+		//dispose();
+
 	}	//	actionPerformed
 	
 }	//	AChat

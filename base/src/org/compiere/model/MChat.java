@@ -207,13 +207,21 @@ public class MChat extends X_CM_Chat
 	public p getHistory (String ConfidentialType)
 	{
 		p history = new p();
-		getEntries(false);
+		getEntries(true);
 		boolean first = true;
 		for (int i = 0; i < m_entries.length; i++)
 		{
 			MChatEntry entry = m_entries[i];
+			// DEBUG
+			System.out.println(entry.getCharacterData());
+			System.out.println(entry.isActive());
+			System.out.println(entry.isConfidentialType(ConfidentialType));
+			// End-of-DEBUG
 			if (!entry.isActive() || !entry.isConfidentialType(ConfidentialType))
 				continue;
+			// DEBUG
+			System.out.println("========== LOLOS ============");
+			// End-of-DEBUG
 			if (first)
 				first = false;
 			else
