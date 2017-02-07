@@ -137,7 +137,8 @@ public final class Calculator extends CDialog
 	private boolean			m_currencyOK = false;
 	private boolean			p_disposeOnEqual = true;	//teo_sarca, bug[ 1628773 ] 
 
-	private final static String OPERANDS = "/*-+%";
+	private final static String OPERANDS = "/*-+%^msctler";
+	private final static String UNARY_OPERANDS = "%sctler";
 	private char			m_decimal = '.';
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(Calculator.class);
@@ -344,7 +345,10 @@ public final class Calculator extends CDialog
 		{
 			String cmd = e.getActionCommand();
 			if (cmd != null && cmd.length() > 0)
-				handleInput(cmd.charAt(0));
+				if (cmd.equals("sqrt"))
+					handleInput('r');
+				else
+					handleInput(cmd.charAt(0));
 		}
 		//	Convert Amount
 		else if (e.getSource() == curTo)
@@ -396,7 +400,11 @@ public final class Calculator extends CDialog
 			//	Commands	===============================
 			case '/':		case '*':
 			case '-':       case '+':
-			case '%':
+			case '%':		case '^':
+			case 's':       case 'c':
+			case 'l':		case 't':
+			case 'm':		case 'e':
+			case 'r':
 				if (m_display.length() > 0)
 				{
 					char last = m_display.charAt(m_display.length()-1);
@@ -405,11 +413,14 @@ public final class Calculator extends CDialog
 					else
 						m_display = m_display.substring(0, m_display.length()-1) + c;
 				}
+				if (c == 'm')
+					m_display += "od";
 				m_display = m_format.format(evaluate());
-				if (c != '%')
+				if (UNARY_OPERANDS.indexOf(c) == -1)
 					m_display += c;
+				if (c == 'm')
+					m_display += "od";
 				break;
-
 			//	Clear last char
 			case 'C':
 				if (m_display.length() > 0)
@@ -435,7 +446,7 @@ public final class Calculator extends CDialog
 				if (isDisposeOnEqual()) //teo_sarca, bug [ 1628773 ] 
 					dispose();
 				break;
-
+			
 			//	Error		===============================
 			default:
 				ADialog.beep();
@@ -467,11 +478,13 @@ public final class Calculator extends CDialog
 			m_number = new BigDecimal(0.0);
 			return m_number;
 		}
-
+		System.out.println("display "+m_display);
 		StringTokenizer st = new StringTokenizer(m_display, OPERANDS, true);
 
 		//	first token
 		String token = st.nextToken();
+		System.out.println("token "+token);
+		
 		//	do we have a negative number ?
 		if (token.equals("-"))
 		{
@@ -483,7 +496,7 @@ public final class Calculator extends CDialog
 				return m_number;
 			}
 		}
-
+		
 		//	First Number
 		Number firstNumber;
 		try
@@ -507,6 +520,8 @@ public final class Calculator extends CDialog
 
 		//	now we should get an operand
 		token = st.nextToken();
+		System.out.println("token2 "+token);
+		
 		if (OPERANDS.indexOf(token) == -1)
 		{
 			log.log(Level.SEVERE, "Calculator.evaluate - Unknown token: " + token);
@@ -515,9 +530,30 @@ public final class Calculator extends CDialog
 		//	get operand
 		char op = token.charAt(0);
 
-		if (op == '%') {
-			firstNo = firstNo.divide(new BigDecimal(100.0), m_format.getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
-			m_number = firstNo;
+		switch (op)
+		{
+			case '%':
+				m_number = firstNo.divide(new BigDecimal(100.0), m_format.getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+				break;
+			case 's':
+				m_number = new BigDecimal(Math.sin(Math.toRadians(firstNo.doubleValue())));
+				break;
+			case 'c':
+				m_number = new BigDecimal(Math.cos(Math.toRadians(firstNo.doubleValue())));
+				break;
+			case 't':
+				m_number = new BigDecimal(Math.tan(Math.toRadians(firstNo.doubleValue())));
+				break;
+			case 'l':
+				m_number = new BigDecimal(Math.log10(firstNo.doubleValue()));
+				break;
+			case 'e':
+				m_number = new BigDecimal(Math.exp(firstNo.doubleValue()));
+				break;
+			case 'r':
+				m_number = new BigDecimal(Math.sqrt(firstNo.doubleValue()));
+			default:
+				break;
 		}
 		
 		//	no second number
@@ -525,6 +561,14 @@ public final class Calculator extends CDialog
 			return m_number;
 
 		token = st.nextToken();
+		System.out.println("token3 "+token);
+		if (token.contains("od")) {
+			if (!st.hasMoreTokens())
+				return m_number;
+			token = token.substring(2, token.length());
+		}
+		System.out.println("token3 "+token);
+		
 		Number secondNumber;
 		try
 		{
@@ -571,6 +615,11 @@ public final class Calculator extends CDialog
 			case '+':
 				m_number = firstNo.add(secondNo);
 				break;
+			case '^':
+				m_number = firstNo.pow(secondNo.intValue());
+				break;
+			case 'm':
+				m_number = new BigDecimal(firstNo.intValue() % secondNo.intValue());
 			default:
 				break;
 		}
