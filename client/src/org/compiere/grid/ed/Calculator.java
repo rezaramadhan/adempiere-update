@@ -499,6 +499,9 @@ public final class Calculator extends CDialog
 				return m_number;
 			}
 		}
+		else {
+			isNegative = false;
+		}
 		
 		//	First Number
 		Number firstNumber;
@@ -627,7 +630,7 @@ public final class Calculator extends CDialog
 				m_number = firstNo.pow(secondNo.intValue());
 				break;
 			case 'm':
-				m_number = new BigDecimal(firstNo.intValue() % secondNo.intValue());
+				m_number = firstNo.remainder(secondNo);
 			default:
 				break;
 		}
