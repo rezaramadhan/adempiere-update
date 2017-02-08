@@ -574,7 +574,7 @@ public final class Calculator extends CDialog
 		token = st.nextToken();
 		System.out.println("token3 "+token);
 		if (token.contains("od")) {
-			if (!st.hasMoreTokens())
+			if (token.equals("od"))
 				return m_number;
 			token = token.substring(2, token.length());
 		}
