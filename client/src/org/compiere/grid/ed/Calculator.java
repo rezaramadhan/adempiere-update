@@ -54,6 +54,7 @@ import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
+import org.jfree.util.Log;
 
 /**
  *  Calculator with currency conversion
@@ -486,8 +487,10 @@ public final class Calculator extends CDialog
 		System.out.println("token "+token);
 		
 		//	do we have a negative number ?
+		boolean isNegative = true;
 		if (token.equals("-"))
 		{
+			isNegative = true;
 			if (st.hasMoreTokens())
 				token += st.nextToken();
 			else
@@ -529,7 +532,12 @@ public final class Calculator extends CDialog
 		}
 		//	get operand
 		char op = token.charAt(0);
-
+		
+		if((op == 'l' || op == 'r') && (isNegative)) {
+			log.log(Level.SEVERE, "Invalid Operations with negative numbers");
+			return m_number;
+		}
+		
 		switch (op)
 		{
 			case '%':
