@@ -499,6 +499,9 @@ public final class Calculator extends CDialog
 				return m_number;
 			}
 		}
+		else {
+			isNegative = false;
+		}
 		
 		//	First Number
 		Number firstNumber;
@@ -571,7 +574,7 @@ public final class Calculator extends CDialog
 		token = st.nextToken();
 		System.out.println("token3 "+token);
 		if (token.contains("od")) {
-			if (!st.hasMoreTokens())
+			if (token.equals("od"))
 				return m_number;
 			token = token.substring(2, token.length());
 		}
@@ -627,7 +630,7 @@ public final class Calculator extends CDialog
 				m_number = firstNo.pow(secondNo.intValue());
 				break;
 			case 'm':
-				m_number = new BigDecimal(firstNo.intValue() % secondNo.intValue());
+				m_number = firstNo.remainder(secondNo);
 			default:
 				break;
 		}
