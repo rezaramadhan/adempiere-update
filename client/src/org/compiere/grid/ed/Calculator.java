@@ -545,24 +545,31 @@ public final class Calculator extends CDialog
 		{
 			case '%':
 				m_number = firstNo.divide(new BigDecimal(100.0), m_format.getMaximumFractionDigits(), BigDecimal.ROUND_HALF_UP);
+				statDisplay = true;
 				break;
 			case 's':
 				m_number = new BigDecimal(Math.sin(Math.toRadians(firstNo.doubleValue())));
+				statDisplay = true;
 				break;
 			case 'c':
 				m_number = new BigDecimal(Math.cos(Math.toRadians(firstNo.doubleValue())));
+				statDisplay = true;
 				break;
 			case 't':
 				m_number = new BigDecimal(Math.tan(Math.toRadians(firstNo.doubleValue())));
+				statDisplay = true;
 				break;
 			case 'l':
 				m_number = new BigDecimal(Math.log10(firstNo.doubleValue()));
+				statDisplay = true;
 				break;
 			case 'e':
 				m_number = new BigDecimal(Math.exp(firstNo.doubleValue()));
+				statDisplay = true;
 				break;
 			case 'r':
 				m_number = new BigDecimal(Math.sqrt(firstNo.doubleValue()));
+				statDisplay = true;
 			default:
 				break;
 		}
