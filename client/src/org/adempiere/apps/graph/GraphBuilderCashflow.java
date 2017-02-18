@@ -22,22 +22,32 @@ public class GraphBuilderCashflow extends GraphBuilder {
 	}
 	
 	public ArrayList<GraphColumn> loadData() {
-		//	Calculated
 
+		//query data disini
+		
 		dataset = new DefaultCategoryDataset();
+		
+		// Tambahin Pemasukan disini
 		for (int i = 0; i < 5; i++){
-			String series = "series" + i;
+			String series = "Income";
+			//ganti sama nilai income
 			int value = i*10;
-			String label = "Label";
-			System.out.println("------series "+ series);
-			for (int i = 0; i < 2; i++)
-			System.out.println("------X axislabel "+ m_X_AxisLabel);
-			System.out.println("------getval "+ value);
-			System.out.println("------getlabel "+ label + "\n-------------------------\n");
-			dataset.addValue(value, series,
-					label);
-
+			//ganti sama data bulan/tanggal dari database
+			String label = "Bulan/Tahun" + i;
+			dataset.addValue(value, series, label);
 		}
+		
+		//Tambahin Pengeluaran disini
+		for (int i = 0; i < 5; i++){
+			String series = "Outcome";
+			//ganti sama nilai outcome
+			int value = i*10;
+			//ganti sama data bulan/tanggal dari database
+			String label = "Bulan/Tahun" + i;
+			//ga harus * -1 kalo datanya udah negatif
+			dataset.addValue(value * -1, series, label);
+		}
+		
 		return null;
 	}
 }

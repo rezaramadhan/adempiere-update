@@ -256,10 +256,10 @@ public class GraphBuilder {
 				cal.setTime(list.get(i).getDate());
 				series = Integer.toString(cal.get(Calendar.YEAR));
 			}
-			System.out.println("------series "+ series);
-			System.out.println("------X axislabel "+ m_X_AxisLabel);
-			System.out.println("------getval "+ list.get(i).getValue());
-			System.out.println("------getlabel "+ list.get(i).getLabel()+ "\n-------------------------\n");
+//			System.out.println("------series "+ series);
+//			System.out.println("------X axislabel "+ m_X_AxisLabel);
+//			System.out.println("------getval "+ list.get(i).getValue());
+//			System.out.println("------getlabel "+ list.get(i).getLabel()+ "\n-------------------------\n");
 			dataset.addValue(list.get(i).getValue(), series,
 					list.get(i).getLabel());
 			linearDataset.addValue(list.get(i).getValue(), m_X_AxisLabel,

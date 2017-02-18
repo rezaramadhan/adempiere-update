@@ -50,9 +50,9 @@ public class GraphCashflow extends Graph {
 	public GraphCashflow()
 	{
 		super();
-		builder = new GraphBuilderCashflow("cashflow");
-		builder.setYAxisLabel("Y_Label");
-		builder.setXAxisLabel("X_Label");
+		builder = new GraphBuilderCashflow("Cashflow");
+		builder.setYAxisLabel("Besar");
+		builder.setXAxisLabel("Bulan");
 		m_userSelection = false;
 		loadData();
 		//addComponentListener(this);
