@@ -44,10 +44,12 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.adempiere.apps.graph.PerformanceDetail;
 import org.compiere.db.CConnection;
 import org.compiere.grid.ed.Calculator;
 import org.compiere.interfaces.Server;
 import org.compiere.model.GridWindowVO;
+import org.compiere.model.MGoal;
 import org.compiere.model.MMenu;
 import org.compiere.model.MQuery;
 import org.compiere.model.MRole;
@@ -472,7 +474,11 @@ public final class AEnv
 		}
 		else if (actionCommand.equals("Cash Flow Chart"))
 		{
-			System.out.println("CashFlow Chart ditampilkan yay");
+			
+			MGoal[] goals = MGoal.getUserGoals(Env.getCtx(), Env.getAD_User_ID(Env.getCtx()));
+			MGoal goal = goals[goals.length - 1];
+			if (goal.getMeasure() != null)
+				new PerformanceDetail(goal);
 		}
 		else if (actionCommand.equals("Script"))
 		{
