@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JComboBox;
+
 import org.compiere.Adempiere;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.ConfirmPanel;
@@ -13,7 +15,7 @@ import org.compiere.util.Env;
 
 public class Cashflow extends CFrame implements ActionListener{
 	private static final long serialVersionUID = -5994488373513922522L;
-
+	
 	/**
 	 * 	Constructor.
 	 * 	Called from PAPanel, ViewPI (Performance Indicator)

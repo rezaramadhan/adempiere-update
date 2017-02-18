@@ -23,7 +23,7 @@ public class GraphBuilderCashflow extends GraphBuilder {
 		graphName = name;
 	}
 	
-	public ArrayList<GraphColumn> loadData() {
+	public ArrayList<GraphColumn> loadData(int year) {
 		// Data Structure
 		double cashIn[] = new double[13];
 		double cashOut[] = new double[13];
@@ -46,7 +46,7 @@ public class GraphBuilderCashflow extends GraphBuilder {
 		try {
 			// ***** INCOME *****
 			ps = DB.prepareStatement(sql_getIncome, null);
-			ps.setInt(1, 2017);
+			ps.setInt(1, year);
 			rs = ps.executeQuery();
 			while(rs.next()) {
 				int monthRes = rs.getInt("month");
@@ -56,7 +56,7 @@ public class GraphBuilderCashflow extends GraphBuilder {
 			
 			// ***** OUTCOME *****
 			ps = DB.prepareStatement(sql_getOutcome, null);
-			ps.setInt(1, 2017);
+			ps.setInt(1, year);
 			rs = ps.executeQuery();
 			while(rs.next()) {
 				int monthRes = rs.getInt("month");
@@ -69,29 +69,27 @@ public class GraphBuilderCashflow extends GraphBuilder {
 		
 		for(int i=1; i<=12; i++) System.out.println("" + cashIn[i] + " " + cashOut[i]);
 		
-		// ***** OUTCOME *****
-		
 		dataset = new DefaultCategoryDataset();
 		
 		// Tambahin Pemasukan disini
-		for (int i = 0; i < 5; i++){
+		for (int i = 1; i <= 12; i++) {
 			String series = "Income";
 			//ganti sama nilai income
-			int value = i*10;
+			double value = cashIn[i];
 			//ganti sama data bulan/tanggal dari database
 			String label = "Bulan/Tahun" + i;
 			dataset.addValue(value, series, label);
 		}
 		
 		//Tambahin Pengeluaran disini
-		for (int i = 0; i < 5; i++){
+		for (int i = 1; i <= 12; i++) {
 			String series = "Outcome";
 			//ganti sama nilai outcome
-			int value = i*10;
+			double value = cashOut[i];
 			//ganti sama data bulan/tanggal dari database
 			String label = "Bulan/Tahun" + i;
 			//ga harus * -1 kalo datanya udah negatif
-			dataset.addValue(value * -1, series, label);
+			dataset.addValue(value, series, label);
 		}
 		
 		return null;
