@@ -470,6 +470,10 @@ public final class AEnv
 		{
 			AEnv.showCenterScreen (new org.compiere.grid.ed.Editor(Env.getFrame(c)));
 		}
+		else if (actionCommand.equals("Cash Flow Chart"))
+		{
+			System.out.println("CashFlow Chart ditampilkan yay");
+		}
 		else if (actionCommand.equals("Script"))
 		{
 			new BeanShellEditor(Env.getFrame(c));
