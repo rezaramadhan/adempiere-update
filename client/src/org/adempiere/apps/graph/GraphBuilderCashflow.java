@@ -1,9 +1,11 @@
 package org.adempiere.apps.graph;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.compiere.model.MMeasure;
+import org.compiere.util.DB;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -22,8 +24,52 @@ public class GraphBuilderCashflow extends GraphBuilder {
 	}
 	
 	public ArrayList<GraphColumn> loadData() {
-
-		//query data disini
+		// Data Structure
+		double cashIn[] = new double[13];
+		double cashOut[] = new double[13];
+		
+		// Query
+		String sql_getIncome = 
+			"SELECT date_part('month', dateinvoiced) AS month, sum(grandtotal) AS total "
+			+ "FROM adempiere.c_cashflow "
+			+ "WHERE grandtotal > 0.0 AND date_part('year', dateinvoiced) = ?"
+			+ "GROUP BY month";
+		
+		String sql_getOutcome =
+			"SELECT date_part('month', dateinvoiced) AS month, sum(grandtotal) AS total "
+			+ "FROM adempiere.c_cashflow "
+			+ "WHERE grandtotal < 0.0 AND date_part('year', dateinvoiced) = ?"
+			+ "GROUP BY month";
+		
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			// ***** INCOME *****
+			ps = DB.prepareStatement(sql_getIncome, null);
+			ps.setInt(1, 2017);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				int monthRes = rs.getInt("month");
+				double grandtotalRes = rs.getDouble("total");
+				cashIn[monthRes] = grandtotalRes;
+			}
+			
+			// ***** OUTCOME *****
+			ps = DB.prepareStatement(sql_getOutcome, null);
+			ps.setInt(1, 2017);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				int monthRes = rs.getInt("month");
+				double grandtotalRes = rs.getDouble("total");
+				cashOut[monthRes] = grandtotalRes;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for(int i=1; i<=12; i++) System.out.println("" + cashIn[i] + " " + cashOut[i]);
+		
+		// ***** OUTCOME *****
 		
 		dataset = new DefaultCategoryDataset();
 		
