@@ -4,10 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
+
+import javax.swing.JComboBox;
 
 import org.compiere.apps.AEnv;
 import org.compiere.grid.ed.VLookup;
@@ -27,20 +31,12 @@ import org.jfree.chart.entity.CategoryItemEntity;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.PieSectionEntity;
 
-public class GraphCashflow extends Graph {
+public class GraphCashflow extends Graph{
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -4150122585550132822L;
-
-	/**
-	 * 	Constructor
-	 */
-	
-	/**
-	 * 	Constructor
-	 *	@param goal goal
-	 */
+	JComboBox<Integer> yearList;
 	
 
 	/**
@@ -50,6 +46,22 @@ public class GraphCashflow extends Graph {
 	public GraphCashflow()
 	{
 		super();
+		
+		yearList = new JComboBox<>();
+		for (int i = 1990; i < 2030; i++) {
+			yearList.addItem(i);;
+		}
+		yearList.setSelectedIndex(0);
+		yearList.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadData();
+            }
+        });
+		add(yearList, BorderLayout.NORTH);
+		
+		
 		builder = new GraphBuilderCashflow("Cashflow");
 		builder.setYAxisLabel("Besar");
 		builder.setXAxisLabel("Bulan");
@@ -61,7 +73,7 @@ public class GraphCashflow extends Graph {
 	protected void loadData()
 	{
 
-		list = builder.loadData();
+		list = builder.loadData(((Integer) yearList.getSelectedItem()).intValue());
 		JFreeChart chart = builder.createChart(X_PA_Goal.CHARTTYPE_BarChart);
 		if (chartPanel != null)
 			remove(chartPanel);
@@ -71,40 +83,8 @@ public class GraphCashflow extends Graph {
 		chartPanel.addChartMouseListener(this);
 		add(chartPanel,BorderLayout.CENTER);
 
-		if (m_userSelection)
-		{
-			int AD_Reference_Value_ID = DB.getSQLValue(null, "SELECT AD_Reference_ID FROM AD_Reference WHERE Name = ?", "PA_Goal ChartType");
-			MLookupInfo info = MLookupFactory.getLookup_List(Env.getLanguage(Env.getCtx()), AD_Reference_Value_ID);
-			MLookup mLookup = new MLookup(info, 0);
-			VLookup lookup = new VLookup("ChartType", false, false, true,
-					mLookup);
-			lookup.addVetoableChangeListener(new VetoableChangeListener() {
-
-				public void vetoableChange(PropertyChangeEvent evt)
-						throws PropertyVetoException {
-					Object value = evt.getNewValue();
-					if (value == null) return;
-					JFreeChart chart = null;
-					chart = builder.createChart(value.toString());
-
-					if (chart != null)
-					{
-						if (chartPanel != null)
-							remove(chartPanel);
-
-						chartPanel = new ChartPanel(chart);
-						chartPanel.setSize(getSize());
-						chartPanel.addChartMouseListener(GraphCashflow.this);
-						add(chartPanel,BorderLayout.CENTER);
-						getParent().validate();
-
-					}
-				}
-
-			});
-			add(lookup, BorderLayout.NORTH);
-		}
 		this.setMinimumSize(paneldimension);
 	}	//	loadData
 
+	
 }

@@ -21,8 +21,9 @@ public class GraphBuilderCashflow extends GraphBuilder {
 		graphName = name;
 	}
 	
-	public ArrayList<GraphColumn> loadData() {
-
+	public ArrayList<GraphColumn> loadData(int year) {
+		System.out.println("yearselected:" + year);
+		
 		//query data disini
 		
 		dataset = new DefaultCategoryDataset();

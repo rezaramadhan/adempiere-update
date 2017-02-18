@@ -268,4 +268,8 @@ public class GraphBuilder {
 		}
 		return list;
 	}
+	
+	public ArrayList<GraphColumn> loadData(int year) {
+		return null;
+	}
 }
