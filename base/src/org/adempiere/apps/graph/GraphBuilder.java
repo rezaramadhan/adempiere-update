@@ -269,7 +269,11 @@ public class GraphBuilder {
 		return list;
 	}
 	
-	public ArrayList<GraphColumn> loadData(int year) {
+	protected ArrayList<GraphColumn> loadData(int year) {
+		return null;
+	}
+	
+	protected CategoryPlot getPlot() {
 		return null;
 	}
 }

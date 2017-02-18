@@ -37,7 +37,7 @@ public class GraphCashflow extends Graph{
 	 */
 	private static final long serialVersionUID = -4150122585550132822L;
 	JComboBox<Integer> yearList;
-	
+	private int year;
 
 	/**
 	 * 	Constructor
@@ -47,33 +47,24 @@ public class GraphCashflow extends Graph{
 	{
 		super();
 		
-		yearList = new JComboBox<>();
-		for (int i = 1990; i < 2030; i++) {
-			yearList.addItem(i);;
-		}
-		yearList.setSelectedIndex(0);
-		yearList.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadData();
-            }
-        });
-		add(yearList, BorderLayout.NORTH);
-		
-		
 		builder = new GraphBuilderCashflow("Cashflow");
 		builder.setYAxisLabel("Besar");
 		builder.setXAxisLabel("Bulan");
 		m_userSelection = false;
-		loadData();
 		//addComponentListener(this);
 	}	//	BarGraph
+	
+	public GraphCashflow(int y) {
+		this();
+		year = y;
+		System.out.println("ctor" + year);
+		loadData();
+	}
 	
 	protected void loadData()
 	{
 
-		list = builder.loadData(((Integer) yearList.getSelectedItem()).intValue());
+		list = builder.loadData(year);
 		JFreeChart chart = builder.createChart(X_PA_Goal.CHARTTYPE_BarChart);
 		if (chartPanel != null)
 			remove(chartPanel);
@@ -86,5 +77,5 @@ public class GraphCashflow extends Graph{
 		this.setMinimumSize(paneldimension);
 	}	//	loadData
 
-	
+
 }

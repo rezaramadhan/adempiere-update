@@ -29,7 +29,7 @@ public class Cashflow extends CFrame implements ActionListener{
 //		MGoal goal = goals[1];
 //		if (goal.getMeasure() != null)
 //			barPanel = new Graph(goal, true);
-		barPanel = new GraphCashflow();
+		
 		init();
 		AEnv.addToWindowManager(this);
 		AEnv.showCenterScreen(this);
@@ -38,11 +38,40 @@ public class Cashflow extends CFrame implements ActionListener{
 	Graph barPanel = null;
 	ConfirmPanel confirmPanel = new ConfirmPanel();
 
+	JComboBox<Integer> yearList;
 	/**
 	 * 	Static init
 	 */
 	private void init()
 	{
+		yearList = new JComboBox<>();
+		for (int i = 1980; i < 2030; i++) {
+			yearList.addItem(i);;
+		}
+		yearList.setSelectedIndex(0);
+		yearList.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	int year = ((Integer) yearList.getSelectedItem()).intValue();
+            	
+            	
+            	barPanel = new GraphCashflow(year);
+            	getContentPane().removeAll();
+            	
+            	getContentPane().add(yearList, BorderLayout.NORTH);
+                getContentPane().add(barPanel, BorderLayout.CENTER);
+                getContentPane().add(confirmPanel, BorderLayout.SOUTH);
+                getContentPane().repaint();
+                pack();
+                validate();
+            }
+        });
+		getContentPane().add(yearList, BorderLayout.NORTH);
+		
+		int year = ((Integer) yearList.getSelectedItem()).intValue();
+        
+		barPanel = new GraphCashflow(year);
 		getContentPane().add(barPanel, BorderLayout.CENTER);
 		getContentPane().add(confirmPanel, BorderLayout.SOUTH);
 		confirmPanel.addActionListener(this);

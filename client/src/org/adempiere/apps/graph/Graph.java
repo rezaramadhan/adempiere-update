@@ -281,6 +281,7 @@ public class Graph extends CPanel implements ChartMouseListener
 	{
 		if ((event.getEntity()!=null) && (event.getTrigger().getClickCount() > 1))
 		{
+			System.out.println("Clicked");
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			try
 			{
