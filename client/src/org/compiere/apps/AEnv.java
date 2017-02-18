@@ -44,6 +44,7 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.adempiere.apps.graph.Cashflow;
 import org.adempiere.apps.graph.PerformanceDetail;
 import org.compiere.db.CConnection;
 import org.compiere.grid.ed.Calculator;
@@ -475,10 +476,7 @@ public final class AEnv
 		else if (actionCommand.equals("Cash Flow Chart"))
 		{
 			
-			MGoal[] goals = MGoal.getUserGoals(Env.getCtx(), Env.getAD_User_ID(Env.getCtx()));
-			MGoal goal = goals[goals.length - 1];
-			if (goal.getMeasure() != null)
-				new PerformanceDetail(goal);
+			new Cashflow();
 		}
 		else if (actionCommand.equals("Script"))
 		{

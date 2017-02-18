@@ -70,6 +70,8 @@ public class Graph extends CPanel implements ChartMouseListener
 		super();
 		this.setLayout(new BorderLayout());
 		builder = new GraphBuilder();
+		
+		
 	}	//	BarGraph
 
 	/**
@@ -101,30 +103,30 @@ public class Graph extends CPanel implements ChartMouseListener
 	/** Graph Size				*/
 	//private Dimension 		m_size = null;
 	/** Zero/Zero Coordinate point	*/
-	private Point			m_point0_0 = null;
+	protected Point			m_point0_0 = null;
 //	/** Layout					*/
 //	private BarGraphLayout	m_layout = new BarGraphLayout(this);
 
 	/**	Logger					*/
-	private static CLogger log = CLogger.getCLogger (Graph.class);
+	protected static CLogger log = CLogger.getCLogger (Graph.class);
 
 
 	/** Y Axis Target Line		*/
 	private double		m_Y_Target	= 0;
 	/** Y Axis Target Line Label */
 	private String		m_Y_TargetLabel = null;
-	private static Dimension			paneldimension = new Dimension(180, 150);
+	protected static Dimension			paneldimension = new Dimension(180, 150);
 
-	private GraphBuilder builder;
+	protected GraphBuilder builder;
 
 	/**
 	 * 	Load Performance Data
 	 */
 	ArrayList<GraphColumn> list = new ArrayList<GraphColumn>();
-	private boolean m_userSelection;
+	protected boolean m_userSelection;
 
 
-	private void loadData()
+	protected void loadData()
 	{
 
 		list = builder.loadData();
@@ -173,7 +175,7 @@ public class Graph extends CPanel implements ChartMouseListener
 		this.setMinimumSize(paneldimension);
 	}	//	loadData
 
-	private ChartPanel chartPanel;
+	protected ChartPanel chartPanel;
 	/**
 	 * 	Get Point 0_0
 	 *	@return point
