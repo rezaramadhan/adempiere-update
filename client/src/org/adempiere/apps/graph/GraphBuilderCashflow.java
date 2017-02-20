@@ -32,14 +32,16 @@ public class GraphBuilderCashflow extends GraphBuilder {
 		String sql_getIncome = 
 			"SELECT date_part('month', dateinvoiced) AS month, sum(grandtotal) AS total "
 			+ "FROM adempiere.c_cashflow "
-			+ "WHERE grandtotal > 0.0 AND date_part('year', dateinvoiced) = ?"
-			+ "GROUP BY month";
+			+ "WHERE grandtotal > 0.0 AND date_part('year', dateinvoiced) = ? "
+			+ "GROUP BY month "
+			+ "ORDER BY month ASC";
 		
 		String sql_getOutcome =
 			"SELECT date_part('month', dateinvoiced) AS month, sum(grandtotal) AS total "
 			+ "FROM adempiere.c_cashflow "
-			+ "WHERE grandtotal < 0.0 AND date_part('year', dateinvoiced) = ?"
-			+ "GROUP BY month";
+			+ "WHERE grandtotal < 0.0 AND date_part('year', dateinvoiced) = ? "
+			+ "GROUP BY month "
+			+ "ORDER BY month ASC";
 		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -93,7 +95,7 @@ public class GraphBuilderCashflow extends GraphBuilder {
 		}
 		
 		for (int i = 1; i <= 12; i++) {
-			double value = cashIn[i] - cashOut[i];
+			double value = cashIn[i] + cashOut[i];
 //			double value = i * 10 * Math.pow(-1, i);
 			String label = "Bln " + i;
 			linearDataset.addValue(value, "Cash", label);
