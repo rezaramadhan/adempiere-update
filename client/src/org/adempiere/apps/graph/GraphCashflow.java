@@ -38,6 +38,7 @@ public class GraphCashflow extends Graph{
 	private static final long serialVersionUID = -4150122585550132822L;
 	JComboBox<Integer> yearList;
 	private int year;
+	private String graphType;
 
 	/**
 	 * 	Constructor
@@ -54,10 +55,11 @@ public class GraphCashflow extends Graph{
 		//addComponentListener(this);
 	}	//	BarGraph
 	
-	public GraphCashflow(int y) {
+	public GraphCashflow(int y, String type) {
 		this();
 		year = y;
-		System.out.println("ctor" + year);
+		graphType = type;
+		System.out.println("ctor" + year + ", " + graphType);
 		loadData();
 	}
 	
@@ -65,7 +67,7 @@ public class GraphCashflow extends Graph{
 	{
 
 		list = builder.loadData(year);
-		JFreeChart chart = builder.createChart(X_PA_Goal.CHARTTYPE_BarChart);
+		JFreeChart chart = builder.createChart(graphType);
 		if (chartPanel != null)
 			remove(chartPanel);
 

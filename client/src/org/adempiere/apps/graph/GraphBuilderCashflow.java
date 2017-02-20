@@ -67,17 +67,17 @@ public class GraphBuilderCashflow extends GraphBuilder {
 			e.printStackTrace();
 		}
 		
-		for(int i=1; i<=12; i++) System.out.println("" + cashIn[i] + " " + cashOut[i]);
+//		for(int i=1; i<=12; i++) System.out.println("" + cashIn[i] + " " + cashOut[i]);
 		
 		dataset = new DefaultCategoryDataset();
-		
+		linearDataset = new DefaultCategoryDataset();
 		// Tambahin Pemasukan disini
 		for (int i = 1; i <= 12; i++) {
 			String series = "Income";
 			//ganti sama nilai income
 			double value = cashIn[i];
 			//ganti sama data bulan/tanggal dari database
-			String label = "Bulan/Tahun" + i;
+			String label = "Bln " + i;
 			dataset.addValue(value, series, label);
 		}
 		
@@ -87,9 +87,16 @@ public class GraphBuilderCashflow extends GraphBuilder {
 			//ganti sama nilai outcome
 			double value = cashOut[i];
 			//ganti sama data bulan/tanggal dari database
-			String label = "Bulan/Tahun" + i;
+			String label = "Bln " + i;
 			//ga harus * -1 kalo datanya udah negatif
 			dataset.addValue(value, series, label);
+		}
+		
+		for (int i = 1; i <= 12; i++) {
+			double value = cashIn[i] - cashOut[i];
+//			double value = i * 10 * Math.pow(-1, i);
+			String label = "Bln " + i;
+			linearDataset.addValue(value, "Cash", label);
 		}
 		
 		return null;
