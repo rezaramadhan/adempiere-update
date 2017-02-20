@@ -68,6 +68,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -137,6 +138,12 @@ public class Calendar extends CDialog
 	public Calendar (Frame frame, String title, Timestamp startTS, int displayType)
 	{
 		super (frame, title, true);
+		super.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				saveNotes(textArea.getText(), m_currentDay, m_currentMonth, m_currentYear);
+			}
+		});
 		log.info(startTS==null ? "null" : startTS.toString() + " - DT=" + displayType);
 		m_displayType = displayType;
 		//
