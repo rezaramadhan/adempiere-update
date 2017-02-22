@@ -18,6 +18,45 @@ package org.compiere.grid.ed;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.logging.Level;
+
+import javax.swing.JSplitPane;
+
+import org.compiere.model.MChat;
+import org.compiere.model.MChatEntry;
+import org.compiere.swing.CButton;
+import org.compiere.swing.CDialog;
+import org.compiere.swing.CPanel;
+import org.compiere.swing.CTextArea;
+import org.compiere.swing.CTextPane;
+import org.compiere.util.CLogger;
+import org.compiere.util.Env;
+import org.compiere.util.Msg;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.logging.Level;
+
+import org.apache.ecs.xhtml.b;
+import org.apache.ecs.xhtml.hr;
+import org.apache.ecs.xhtml.p;
+import org.compiere.util.CLogger;
+import org.compiere.util.DB;
+import org.compiere.util.DisplayType;
+import org.compiere.util.Env;
+import org.compiere.util.Util;
+
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,6 +68,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -44,6 +84,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -55,6 +96,8 @@ import org.compiere.swing.CComboBox;
 import org.compiere.swing.CDialog;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CPanel;
+import org.compiere.swing.CTextArea;
+import org.compiere.swing.CTextPane;
 import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
@@ -95,6 +138,12 @@ public class Calendar extends CDialog
 	public Calendar (Frame frame, String title, Timestamp startTS, int displayType)
 	{
 		super (frame, title, true);
+		super.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				saveNotes(textArea.getText(), m_currentDay, m_currentMonth, m_currentYear);
+			}
+		});
 		log.info(startTS==null ? "null" : startTS.toString() + " - DT=" + displayType);
 		m_displayType = displayType;
 		//
@@ -169,7 +218,11 @@ public class Calendar extends CDialog
 	private CButton bOK = new CButton();
 	private GridBagLayout timeLayout = new GridBagLayout();
 	private boolean userTime = true;
-
+	//for note
+	private JTabbedPane tabbedPane = new JTabbedPane();
+	private CTextArea textArea = new CTextArea();
+	private CTextPane textPane = new CTextPane();
+	private CButton bSave = new CButton();
 	/**
 	 *	Static init
 	 *  @throws Exception
@@ -184,7 +237,13 @@ public class Calendar extends CDialog
 		//mainPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(4,4,4,2));
 		getContentPane().add(mainPanel);
-
+		//NOTES
+		textArea.setPreferredSize(new Dimension(600, 100));
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
+		tabbedPane.add(textArea, "Notes");
+		textArea.addKeyListener(this);
+		textArea.setFont(new Font("Consolas",Font.PLAIN,28));
 		//	Month Panel
 		monthPanel.setLayout(monthLayout);
 		monthPanel.add(bBack,        new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
@@ -242,7 +301,10 @@ public class Calendar extends CDialog
 		bOK.setIcon(Env.getImageIcon("Ok16.gif"));
 		bOK.setMargin(new Insets(0,1,0,1));
 		bOK.addActionListener(this);
-		
+		tabbedPane.addChangeListener(this);
+		mainPanel.add(tabbedPane, BorderLayout.SOUTH);
+		Color col = new Color(255,255,255);
+		mainPanel.setBackground(col);
 		AutoCompletion.enable(fHour);
 		
 	}	//	jbInit
@@ -292,9 +354,10 @@ public class Calendar extends CDialog
 		//	Short: h:mm a - HH:mm 	Long: h:mm:ss a z - HH:mm:ss z
 		SimpleDateFormat formatTime = (SimpleDateFormat)DateFormat.getTimeInstance(DateFormat.SHORT, loc);
 		m_hasAM_PM = formatTime.toPattern().indexOf('a') != -1;
-		if (m_hasAM_PM)
+		if (m_hasAM_PM){
 			cbPM.setText(formatTime.getDateFormatSymbols().getAmPmStrings()[1]);
-		else
+			cbPM.setFont(new Font("Consolas",Font.PLAIN,28));
+		} else
 			cbPM.setVisible(false);
 
 		//	Years
@@ -329,20 +392,28 @@ public class Calendar extends CDialog
 			{
 				int index = i*7 + j;
 				m_days[index] = createDay();
+				m_days[index].setFont(new Font("Consolas",Font.PLAIN,30));
 				dayPanel.add(m_days[index], null);
 			}
 
 		//	Today button
-		m_days[m_days.length-1].setBackground(Color.green);
+		Color col = new Color(155,253,155);
+		m_days[m_days.length-1].setBackground(col);
 		m_days[m_days.length-1].setText("*");
+		m_days[m_days.length-1].setFont(new Font("Consolas",Font.PLAIN,1));
+		m_days[m_days.length-1].setIcon(Env.getImageIcon("thisday(3).png"));
 		m_days[m_days.length-1].setToolTipText(Msg.getMsg(Env.getCtx(), "Today"));
 		//	Cancel
 		m_days[m_days.length-2].setBackground(Color.red);
 		m_days[m_days.length-2].setText("x");
+		m_days[m_days.length-2].setFont(new Font("Consolas",Font.PLAIN,1));
+		m_days[m_days.length-2].setIcon(Env.getImageIcon("byebye.png"));
 		m_days[m_days.length-2].setToolTipText(Msg.getMsg(Env.getCtx(), "Cancel"));
 		//	Clear
 		m_days[m_days.length-3].setBackground(Color.yellow);
 		m_days[m_days.length-3].setText(Msg.getMsg(Env.getCtx(), "Key_Clear"));
+		m_days[m_days.length-3].setFont(new Font("Consolas",Font.PLAIN,1));
+		m_days[m_days.length-3].setIcon(Env.getImageIcon("rsz_close.png"));
 		m_days[m_days.length-3].setToolTipText(Msg.getMsg(Env.getCtx(), "Clear"));
 
 		//	Date/Time
@@ -358,6 +429,8 @@ public class Calendar extends CDialog
 		m_setting = false;
 		setCalendar();
 		userTime = false;
+		loadNotes(m_currentDay,m_currentMonth,m_currentYear);
+		
 	}	//	loadData
 
 	/**
@@ -375,6 +448,7 @@ public class Calendar extends CDialog
 		label.setBackground(AdempierePLAF.getPrimary1());
 		label.setForeground(Color.white);
 		label.setOpaque(true);
+		label.setFont(new Font("Consolas",Font.PLAIN,28));
 		return label;
 	}	//	createWeekday
 
@@ -463,7 +537,8 @@ public class Calendar extends CDialog
 			{
 				if (m_currentDay == curDay)
 				{
-					m_days[i].setBackground(Color.blue);
+					Color col = new Color(255,127,80);
+					m_days[i].setBackground(col);
 					m_days[i].setForeground(Color.yellow);
 					m_today = m_days[i];
 					m_today.requestFocus();
@@ -600,30 +675,38 @@ public class Calendar extends CDialog
 
 		if (e.getSource() == bOK)
 		{
+			saveNotes(textArea.getText(),m_currentDay,m_currentMonth,m_currentYear);
 			m_abort = false;
 			dispose();
 			return;
 		}
 		else if (e.getSource() == bBack)
 		{
+			saveNotes(textArea.getText(),m_currentDay,m_currentMonth,m_currentYear);
 			if (--m_currentMonth < 1)
 			{
 				m_currentMonth = 12;
 				m_currentYear--;
 			}
 			m_lastDay = -1;
+			//testing try change notes
+//			textArea.setText(Integer.toString(m_currentMonth));
+			loadNotes(m_currentDay,m_currentMonth,m_currentYear);
 		}
 		else if (e.getSource() == bNext)
 		{
+			saveNotes(textArea.getText(),m_currentDay,m_currentMonth,m_currentYear);
 			if (++m_currentMonth > 12)
 			{
 				m_currentMonth = 1;
 				m_currentYear++;
 			}
 			m_lastDay = -1;
+			loadNotes(m_currentDay,m_currentMonth,m_currentYear);
 		}
 		else if (e.getSource() instanceof JButton)
 		{
+			saveNotes(textArea.getText(),m_currentDay,m_currentMonth,m_currentYear);
 			JButton b = (JButton)e.getSource();
 			String text = b.getText();
 			//	Today - Set to today's date
@@ -635,6 +718,7 @@ public class Calendar extends CDialog
 				m_currentYear = m_calendar.get(java.util.Calendar.YEAR);
 				m_current24Hour = m_calendar.get(java.util.Calendar.HOUR_OF_DAY);
 				m_currentMinute = m_calendar.get(java.util.Calendar.MINUTE);
+				loadNotes(m_currentDay,m_currentMonth,m_currentYear);
 			}
 			//	Cancel
 			else if (text.equals("x"))
@@ -664,6 +748,7 @@ public class Calendar extends CDialog
 				}
 				m_lastClick = currentClick;
 				m_lastDay = m_currentDay;
+				loadNotes(m_currentDay,m_currentMonth,m_currentYear);
 			}
 		}
 		else if (e.getSource() == cbPM)
@@ -735,8 +820,115 @@ public class Calendar extends CDialog
 	 *	@param e
 	 */
 	public void mouseReleased(MouseEvent e) {}
+	/**
+	 * 	saveNotes
+	 *	@param note,day,month,year
+	 */
+	public void saveNotes(String note, int day, int month, int year)
+	{
+		String sql = "select * from adempiere.calender_notes where day_note=? and month_note=? and year_note=?";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement (sql, null);
+			pstmt.setInt (1, day);
+			pstmt.setInt (2, month);
+			pstmt.setInt (3, year);
+			rs = pstmt.executeQuery ();
+			
+			if (rs.next()){
+				String sqlUpdate = "update adempiere.calender_notes set note=? where id_notes=?";
+				PreparedStatement preparedStmtUpdate = null;
+				try
+				{
+					 preparedStmtUpdate = DB.prepareStatement(sqlUpdate, null);
+				     preparedStmtUpdate.setString(1, note);
+				     preparedStmtUpdate.setInt(2, rs.getInt("id_notes"));
 
-	
+				     preparedStmtUpdate.execute();
+				}
+				catch (Exception en)
+				{
+					System.out.println(en.getMessage());
+				}
+				finally
+				{
+					DB.close(null, preparedStmtUpdate);
+				}
+			} else {
+				String sqlInsert = "insert into adempiere.calender_notes (note, day_note, month_note, year_note) VALUES (?,?,?,?)";
+				PreparedStatement preparedStmtInsert = null;
+				try
+				{
+					 preparedStmtInsert = DB.prepareStatement(sqlInsert, null);
+				     preparedStmtInsert.setString(1, note);
+				     preparedStmtInsert.setInt(2, day);
+				     preparedStmtInsert.setInt(3, month);
+				     preparedStmtInsert.setInt(4, year);
+
+				     preparedStmtInsert.execute();
+				}
+				catch (Exception en)
+				{
+					System.out.println(en.getMessage());
+				}
+				finally
+				{
+					DB.close(null, preparedStmtInsert);
+				}
+			}
+			
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null; pstmt = null;
+		}
+		
+		
+	}
+	/**
+	 * 	loadNotes
+	 *	@param day,month,year
+	 */
+	public void loadNotes(int day, int month, int year)
+	{
+		
+		String sql = "select * from adempiere.calender_notes where day_note=? and month_note=? and year_note=?";
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement (sql, null);
+			pstmt.setInt (1, day);
+			pstmt.setInt (2, month);
+			pstmt.setInt (3, year);
+			rs = pstmt.executeQuery ();
+			if (rs.next ())
+			{
+				
+				textArea.setText(rs.getString("note"));
+			} else {
+				textArea.setText("");
+			}
+			
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null; pstmt = null;
+		}
+	}
+
 	/**************************************************************************
 	 * 	Key Released - Return on enter
 	 *  @param e event
@@ -879,8 +1071,7 @@ class MinuteModel extends SpinnerNumberModel
 		int steps = minutes / m_snapSize;
 		return new Integer(steps * m_snapSize);
 	}	//	getNextValue
-
-
+	
 	/**
 	 * 	Return previous full step value
 	 *  @return previous snap value
