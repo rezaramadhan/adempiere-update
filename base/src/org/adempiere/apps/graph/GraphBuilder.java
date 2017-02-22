@@ -36,6 +36,7 @@ import org.jfree.data.general.DefaultPieDataset;
  */
 public class GraphBuilder {
 
+	protected String		graphName = "";
 	/** The Goal				*/
 	protected MGoal 		m_goal = null;
 	/** X Axis Label			*/
@@ -46,7 +47,7 @@ public class GraphBuilder {
 	protected DefaultCategoryDataset linearDataset = new DefaultCategoryDataset();
 	protected DefaultPieDataset pieDataset = new DefaultPieDataset();
 
-	private static final CLogger log = CLogger.getCLogger(GraphBuilder.class);
+	protected static final CLogger log = CLogger.getCLogger(GraphBuilder.class);
 
 	public GraphBuilder() {
 		super();
@@ -88,9 +89,9 @@ public class GraphBuilder {
 		}
 	}
 
-	private JFreeChart createWaterfallChart() {
+	protected JFreeChart createWaterfallChart() {
 		JFreeChart chart = ChartFactory.createWaterfallChart(
-				m_goal.getMeasure().getName(),         // chart title
+				graphName,         // chart title
 				m_X_AxisLabel,               // domain axis label
 				m_Y_AxisLabel,                  // range axis label
 				linearDataset,                  // data
@@ -105,7 +106,7 @@ public class GraphBuilder {
 	}
 
 	private JFreeChart createRingChart() {
-		final JFreeChart chart = ChartFactory.createRingChart(m_goal.getMeasure().getName(),
+		final JFreeChart chart = ChartFactory.createRingChart(graphName,
 				pieDataset, false, true, true);
 
 		return chart;
@@ -113,7 +114,7 @@ public class GraphBuilder {
 
 	private JFreeChart createBarChart() {
 		JFreeChart chart = ChartFactory.createBarChart3D(
-				m_goal.getMeasure().getName(),         // chart title
+				graphName,         // chart title
 				m_X_AxisLabel,               // domain axis label
 				m_Y_AxisLabel,                  // range axis label
 				dataset,                  // data
@@ -128,7 +129,7 @@ public class GraphBuilder {
 	}
 
 	private JFreeChart createPieChart() {
-		final JFreeChart chart = ChartFactory.createPieChart3D(m_goal.getMeasure().getName(),
+		final JFreeChart chart = ChartFactory.createPieChart3D(graphName,
 				pieDataset, false, true, true);
 
 		return chart;
@@ -137,7 +138,7 @@ public class GraphBuilder {
 	private JFreeChart createAreaChart() {
 		// create the chart...
 		JFreeChart chart = ChartFactory.createAreaChart(
-				m_goal.getMeasure().getName(),         // chart title
+				graphName,         // chart title
 				m_X_AxisLabel,               // domain axis label
 				m_Y_AxisLabel,                  // range axis label
 				dataset,                  // data
@@ -151,7 +152,7 @@ public class GraphBuilder {
 		return chart;
 	}
 
-	private void setupCategoryChart(JFreeChart chart) {
+	protected void setupCategoryChart(JFreeChart chart) {
 		CategoryPlot plot = chart.getCategoryPlot();
 		CategoryItemRenderer renderer = plot.getRenderer();
 		renderer.setSeriesPaint(0, new Color(92/255f, 178/255f, 232/255f));
@@ -168,7 +169,7 @@ public class GraphBuilder {
 	private JFreeChart createLineChart() {
 		// create the chart...
 		JFreeChart chart = ChartFactory.createLineChart3D(
-				m_goal.getMeasure().getName(),         // chart title
+				graphName,         // chart title
 				m_X_AxisLabel,               // domain axis label
 				m_Y_AxisLabel,                  // range axis label
 				linearDataset,                  // data
@@ -196,6 +197,7 @@ public class GraphBuilder {
 	 */
 	public void setMGoal(MGoal mgoal) {
 		m_goal = mgoal;
+		graphName = m_goal.getMeasure().getName();
 	}
 
 	/**
@@ -254,6 +256,10 @@ public class GraphBuilder {
 				cal.setTime(list.get(i).getDate());
 				series = Integer.toString(cal.get(Calendar.YEAR));
 			}
+			System.out.println("------series "+ series);
+			System.out.println("------X axislabel "+ m_X_AxisLabel);
+//			System.out.println("------getval "+ list.get(i).getValue());
+			System.out.println("------getlabel "+ list.get(i).getLabel()+ "\n-------------------------\n");
 			dataset.addValue(list.get(i).getValue(), series,
 					list.get(i).getLabel());
 			linearDataset.addValue(list.get(i).getValue(), m_X_AxisLabel,
@@ -261,5 +267,13 @@ public class GraphBuilder {
 			pieDataset.setValue(list.get(i).getLabel(), list.get(i).getValue());
 		}
 		return list;
+	}
+	
+	protected ArrayList<GraphColumn> loadData(int year) {
+		return null;
+	}
+	
+	protected CategoryPlot getPlot() {
+		return null;
 	}
 }

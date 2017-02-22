@@ -44,10 +44,13 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.adempiere.apps.graph.Cashflow;
+import org.adempiere.apps.graph.PerformanceDetail;
 import org.compiere.db.CConnection;
 import org.compiere.grid.ed.Calculator;
 import org.compiere.interfaces.Server;
 import org.compiere.model.GridWindowVO;
+import org.compiere.model.MGoal;
 import org.compiere.model.MMenu;
 import org.compiere.model.MQuery;
 import org.compiere.model.MRole;
@@ -469,6 +472,11 @@ public final class AEnv
 		else if (actionCommand.equals("Editor"))
 		{
 			AEnv.showCenterScreen (new org.compiere.grid.ed.Editor(Env.getFrame(c)));
+		}
+		else if (actionCommand.equals("Cash Flow Chart"))
+		{
+			
+			new Cashflow();
 		}
 		else if (actionCommand.equals("Script"))
 		{
